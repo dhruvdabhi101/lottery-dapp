@@ -1,3 +1,4 @@
+ // @ts-nocheck
 "use client";
 import { useState } from "react";
 import { useEffect } from "react";
@@ -18,12 +19,14 @@ import {
 } from "@chakra-ui/react";
 import TableData from "@/component/TableData";
 import { OwnerAddress } from "@/contract/contractInfo";
+import { ethers } from "ethers";
 
 const Home = () => {
   const { isConnected, address } = useWeb3ModalAccount();
   const [loading, setLoading] = useState(false);
   const [lotteryPlayers, setLotteryPlayers] = useState([]);
   const [winners, setWinners] = useState([]);
+  const [winnersWithAmount, setWinnersWithAmount] = useState<{address: string, amount: number}[]>([]);
   const [lotteryStatus, setLotteryStatus] = useState<boolean | undefined>();
   const [isParticipant, setIsParticipant] = useState<boolean>(false);
   const {
@@ -33,6 +36,7 @@ const Home = () => {
     participate,
     restartLottery,
     endLottery,
+    getWinnerAmount,
   } = useAppContext();
   const { push } = useRouter();
   const fetchData = async () => {
@@ -46,7 +50,10 @@ const Home = () => {
     setLotteryPlayers(players!);
     setWinners(winners!);
     //@ts-ignore
-    if (players?.includes(address!)) {
+    if (players && players?.includes(address!)) {
+      setIsParticipant(true);
+    }
+    if (winners && winners?.includes(address!)) {
       setIsParticipant(true);
     }
     setLoading(false);
@@ -87,41 +94,38 @@ const Home = () => {
   }, [isConnected]);
   return (
     <div className="w-full flex flex-col h-full p-3">
-      {loading && <div>Loading...</div>}
-      {!loading && (
-        <div className="flex flex-col gap-8">
-          <div className="flex flex-row justify-end">
-            <w3m-button />
-          </div>
-          {winners && winners.length > 0 && (
-            <div className="flex flex-col gap-3">
-              <Heading as="h1" size="lg" textAlign="center" mb={4}>
-                Winners
-              </Heading>
-              <TableData data={winners} />
-            </div>
-          )}
-
+      <div className="flex flex-col gap-8">
+        <div className="flex flex-row justify-end">
+          <w3m-button />
+        </div>
+        {winners && winners.length > 0 && (
           <div className="flex flex-col gap-3">
             <Heading as="h1" size="lg" textAlign="center" mb={4}>
-              Participants
+              Winners
             </Heading>
-            <TableData data={lotteryPlayers} />
-            {!isParticipant && (
-              <div className="self-center mt-6">
-                <Button
-                  colorScheme="purple"
-                  padding={5}
-                  disabled={!lotteryStatus}
-                  onClick={getTicket}
-                >
-                  Participate
-                </Button>
-              </div>
-            )}
+            <TableData data={winners} />
           </div>
+        )}
+
+        <div className="flex flex-col gap-3">
+          <Heading as="h1" size="lg" textAlign="center" mb={4}>
+            Participants
+          </Heading>
+          <TableData data={lotteryPlayers} />
+          {!isParticipant && !lotteryStatus && (
+            <div className="self-center mt-6">
+              <Button
+                colorScheme="purple"
+                padding={5}
+                disabled={!lotteryStatus}
+                onClick={getTicket}
+              >
+                Participate
+              </Button>
+            </div>
+          )}
         </div>
-      )}
+      </div>
       {address === OwnerAddress ? (
         <div className="flex flex-row gap-3 self-center mt-5">
           <div>
@@ -136,7 +140,13 @@ const Home = () => {
             </Button>
           </div>
           <div>
-            <Button colorScheme="red" padding={5} onClick={fetchData}>
+            <Button
+              colorScheme="red"
+              padding={5}
+              onClick={async () => {
+                await deleteLottery();
+              }}
+            >
               End Lottery
             </Button>
           </div>

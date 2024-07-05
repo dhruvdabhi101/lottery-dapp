@@ -13,6 +13,7 @@ export const appContext = createContext({
   participate: () => Promise.resolve(),
   endLottery: () => Promise.resolve(),
   restartLottery: () => Promise.resolve(),
+  getWinnerAmount: (address: string) => Promise.resolve(),
   owner: '',
 });
 
@@ -31,13 +32,6 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   }, [isConnected])
 
   const connectWalletAndContract = async () => {
-    // const provider = new BrowserProvider(walletProvider!);
-    // const ethersProvider = new BrowserProvider(walletProvider!);
-    // const contract = new Contract(LOTTERYADDRESS, LotteryABI, ethersProvider)
-    // const signer = await provider.getSigner()
-    // contract.connect(signer)
-    // console.log(signer)
-    // setLotteryContract(contract)
     const provider = new ethers.BrowserProvider(walletProvider!)
     const signer = await provider.getSigner()
     const contract = new ethers.Contract(LOTTERYADDRESS, LotteryABI, signer)
@@ -101,6 +95,14 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
       console.log(error)
     }
   }
+  const getWinnerAmount = async (address: string) => {
+    try {
+      let res = await lotteryContract?.prizeMoney(address)
+      return res;
+    } catch (error) {
+      console.log(error)
+    }
+  }
     
 
   return <appContext.Provider value={{
@@ -112,6 +114,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     participate,
     endLottery,
     restartLottery,
+    getWinnerAmount,
     owner,
   }}> {children} </appContext.Provider>
 }

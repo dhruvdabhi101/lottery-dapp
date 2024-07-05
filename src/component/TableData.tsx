@@ -1,4 +1,4 @@
-'use client'
+"use client";
 import {
   Box,
   TableContainer,
@@ -13,6 +13,7 @@ import {
 
 type TableProps = {
   data: string[];
+  extraData?: string[];
 };
 const TableData = (props: TableProps) => {
   return (
@@ -28,6 +29,7 @@ const TableData = (props: TableProps) => {
           <Thead>
             <Tr>
               <Th>Address</Th>
+              {props.extraData?.length ? <Th>Amount</Th> : null}
             </Tr>
           </Thead>
           <Tbody>
@@ -54,6 +56,9 @@ const TableData = (props: TableProps) => {
                     alt="profile"
                   />
                   <Td fontWeight={600}>{player}</Td>
+                  {props.extraData?.length ? (
+                    <Td fontWeight={600}>{props.extraData[index]}</Td>
+                  ) : null}
                 </Tr>
               ))}
           </Tbody>
