@@ -8,7 +8,8 @@ contract Lottery {
     bool public lotteryEnded;
     uint256 public numberOfWinners;
     address[] public winners;
-    uint256 lotteryId;
+    uint256 public lotteryId;
+    mapping(address => uint256) public prizeMoney;
 
     event LotteryEntered(address indexed participant);
     event LotteryEnded(address[] winners, uint256 prizePerWinner);
@@ -23,7 +24,8 @@ contract Lottery {
         require(msg.sender == owner, "Only owner can call this function");
         _;
     }
-    function restartLottery() public {
+
+    function restartLottery() public onlyOwner {
         lotteryEnded = false;
         delete participants;
         delete winners;
@@ -51,6 +53,7 @@ contract Lottery {
             uint256 randomIndex = random() % participants.length;
             address winner = participants[randomIndex];
             winners.push(winner);
+            prizeMoney[winner] = prizePerWinner;
             payable(winner).transfer(prizePerWinner);
 
             // Remove the winner from the participants array
@@ -73,6 +76,9 @@ contract Lottery {
         return winners;
     }
 
+    function getPrizeMoney(address _winner) public view returns (uint256) {
+        return prizeMoney[_winner];
+    }
+
     receive() external payable {}
 }
-

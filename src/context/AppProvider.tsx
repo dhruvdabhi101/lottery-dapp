@@ -26,20 +26,21 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     if (isConnected) {
-      connectWalletAndContract().then(() => {
-        getLotteryPlayers()
-        getLotteryStatus()
-      })
-
+      connectWalletAndContract()
     }
   }, [isConnected])
 
   const connectWalletAndContract = async () => {
-    const provider = new BrowserProvider(walletProvider!);
-    const ethersProvider = new BrowserProvider(walletProvider!);
-    const contract = new Contract(LOTTERYADDRESS, LotteryABI, ethersProvider)
+    // const provider = new BrowserProvider(walletProvider!);
+    // const ethersProvider = new BrowserProvider(walletProvider!);
+    // const contract = new Contract(LOTTERYADDRESS, LotteryABI, ethersProvider)
+    // const signer = await provider.getSigner()
+    // contract.connect(signer)
+    // console.log(signer)
+    // setLotteryContract(contract)
+    const provider = new ethers.BrowserProvider(walletProvider!)
     const signer = await provider.getSigner()
-    contract.connect(signer)
+    const contract = new ethers.Contract(LOTTERYADDRESS, LotteryABI, signer)
     setLotteryContract(contract)
   }
 
