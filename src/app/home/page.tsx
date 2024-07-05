@@ -33,8 +33,9 @@ const Home = () => {
       getLotteryStatus(),
       getLotteryWinners(),
     ]);
-    setLotteryStatus(status!);
     setLotteryPlayers(players!);
+    setLotteryStatus(status!);
+    console.log(status)
     setWinners(winners!);
     //@ts-ignore
     if (players && players?.includes(address!)) {
@@ -78,7 +79,7 @@ const Home = () => {
     } else {
       fetchData();
     }
-  }, [isConnected]);
+  }, [isConnected, address]);
   return (
     <div className="w-full flex flex-col h-full p-3">
       <div className="flex flex-col gap-8">
