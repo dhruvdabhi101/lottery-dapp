@@ -6,27 +6,14 @@ import { Box, Button, Heading, Image, background } from "@chakra-ui/react";
 import { useRouter } from "next/navigation";
 import { useWeb3ModalAccount } from "@web3modal/ethers/react";
 import { useAppContext } from "@/context/AppProvider";
-import {
-  Table,
-  Thead,
-  Tbody,
-  Tfoot,
-  Tr,
-  Th,
-  Td,
-  TableCaption,
-  TableContainer,
-} from "@chakra-ui/react";
 import TableData from "@/component/TableData";
 import { OwnerAddress } from "@/contract/contractInfo";
-import { ethers } from "ethers";
 
 const Home = () => {
   const { isConnected, address } = useWeb3ModalAccount();
   const [loading, setLoading] = useState(false);
   const [lotteryPlayers, setLotteryPlayers] = useState([]);
   const [winners, setWinners] = useState([]);
-  const [winnersWithAmount, setWinnersWithAmount] = useState<{address: string, amount: number}[]>([]);
   const [lotteryStatus, setLotteryStatus] = useState<boolean | undefined>();
   const [isParticipant, setIsParticipant] = useState<boolean>(false);
   const {
@@ -107,11 +94,13 @@ const Home = () => {
           </div>
         )}
 
+
         <div className="flex flex-col gap-3">
           <Heading as="h1" size="lg" textAlign="center" mb={4}>
             Participants
           </Heading>
           <TableData data={lotteryPlayers} />
+          {/* Checking if you are a participant and if lottery is completed, then we won't show the participate button */}
           {!isParticipant && !lotteryStatus && (
             <div className="self-center mt-6">
               <Button
@@ -126,6 +115,7 @@ const Home = () => {
           )}
         </div>
       </div>
+      {/* we will give access to change the lottery only to the owner of the contract  */}
       {address === OwnerAddress ? (
         <div className="flex flex-row gap-3 self-center mt-5">
           <div>

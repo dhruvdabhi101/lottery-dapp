@@ -3,6 +3,7 @@ import { SetStateAction, createContext, useContext, useEffect, useState } from "
 import { Contract, ethers } from "ethers";
 import { BrowserProvider, parseUnits } from "ethers";
 import { LotteryABI, LOTTERYADDRESS } from "@/contract/contractInfo";
+import { ReactNode } from "react";
 
 export const appContext = createContext({
   connectWalletAndContract: () => Promise.resolve(),
@@ -17,8 +18,8 @@ export const appContext = createContext({
   owner: '',
 });
 
-import { ReactNode } from "react";
 
+// Provider for all the contract function calls
 export const AppProvider = ({ children }: { children: ReactNode }) => {
   const [lotteryContract, setLotteryContract] = useState<Contract>();
   const owner = '0x9f74C3351798E7C1D069ABCCC1E9Bf98573c22A2';
@@ -31,6 +32,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     }
   }, [isConnected])
 
+  // used to get signer
   const connectWalletAndContract = async () => {
     const provider = new ethers.BrowserProvider(walletProvider!)
     const signer = await provider.getSigner()
