@@ -1,4 +1,4 @@
- // @ts-nocheck
+// @ts-nocheck
 "use client";
 import { useState } from "react";
 import { useEffect } from "react";
@@ -8,6 +8,7 @@ import { useWeb3ModalAccount } from "@web3modal/ethers/react";
 import { useAppContext } from "@/context/AppProvider";
 import TableData from "@/component/TableData";
 import { OwnerAddress } from "@/contract/contractInfo";
+import { ClimbingBoxLoader } from "react-spinners";
 
 const Home = () => {
   const { isConnected, address } = useWeb3ModalAccount();
@@ -28,21 +29,24 @@ const Home = () => {
   const { push } = useRouter();
   const fetchData = async () => {
     setLoading(true);
-    const [players, status, winners] = await Promise.all([
-      getLotteryPlayers(),
-      getLotteryStatus(),
-      getLotteryWinners(),
-    ]);
-    setLotteryPlayers(players!);
-    setLotteryStatus(status!);
-    console.log(status)
-    setWinners(winners!);
-    //@ts-ignore
-    if (players && players?.includes(address!)) {
-      setIsParticipant(true);
-    }
-    if (winners && winners?.includes(address!)) {
-      setIsParticipant(true);
+    try {
+      const [players, status, winners] = await Promise.all([
+        getLotteryPlayers(),
+        getLotteryStatus(),
+        getLotteryWinners(),
+      ]);
+      setLotteryPlayers(players!);
+      setLotteryStatus(status!);
+      setWinners(winners!);
+      //@ts-ignore
+      if (players && players?.includes(address!)) {
+        setIsParticipant(true);
+      }
+      if (winners && winners?.includes(address!)) {
+        setIsParticipant(true);
+      }
+    } catch (error) {
+      console.log(error);
     }
     setLoading(false);
   };
@@ -80,6 +84,15 @@ const Home = () => {
       fetchData();
     }
   }, [isConnected, address]);
+
+
+  if (loading) {
+    return (
+      <div className="flex flex-col h-screen w-full justify-center items-center ">
+        <ClimbingBoxLoader />
+      </div>
+    )
+  }
   return (
     <div className="w-full flex flex-col h-full p-3">
       <div className="flex flex-col gap-8">
